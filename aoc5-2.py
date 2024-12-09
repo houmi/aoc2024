@@ -1,10 +1,36 @@
-
 orderList = {}
-
 docs = []
 
+def topSort(values):
+    def dfs(node):
+        visited.add(node)
+        tempStack.add(node)
+        try:
+            intersection = list(set(values) & set(orderList[node]))
+            for next in intersection:
+                if next not in visited:
+                    if not dfs(next):
+                        return False
+                elif next in tempStack:
+                    return False
+        except:
+            pass
+        tempStack.remove(node)
+        stack.append(node)
+        return True
+       
+    visited = set()
+    tempStack = set()
+    stack = []
 
-with open('temp.txt', 'r') as file:
+    for node in values:
+        if node not in visited:
+            if (dfs(node) == False):
+                stack.append(node)
+
+    return stack[::-1]
+
+with open('aoc5.txt', 'r') as file:
     for line in file:
         lineStr = line.strip()
         if "|" in lineStr:
@@ -33,13 +59,8 @@ for i in range(len(docs)):
         else:
             error = -1
             break
-    if (error == 0):
-        result += docs[i][len(docs[i]) // 2]
-
+    if (error == -1):
+        newVals = topSort(docs[i])
+        result += newVals[len(newVals) //2]
+        
 print(result)
-
-print(75, orderList.get(75))
-print(97, orderList.get(97))
-print(47, orderList.get(47))
-print(61, orderList.get(61))
-print(53, orderList.get(53))
