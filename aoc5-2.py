@@ -25,8 +25,7 @@ def topSort(values):
 
     for node in values:
         if node not in visited:
-            if (dfs(node) == False):
-                stack.append(node)
+            dfs(node)
 
     return stack[::-1]
 
