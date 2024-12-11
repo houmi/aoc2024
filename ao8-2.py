@@ -12,6 +12,12 @@ def inRange(point):
         return False
     return True
 
+def expandAntiNodes(point, dx, dy):
+    point = (point[0]-dx, point[1]-dy)
+    while inRange(point):
+        antinodes.append(point)
+        point = (point[0]-dx, point[1]-dy)
+
 with open('aoc8.txt', 'r') as file:
     for line in file:
         row = list(line.strip())
@@ -31,26 +37,13 @@ for combination in combinations:
     dx=combination[1][0]-combination[0][0]
     dy=combination[1][1]-combination[0][1]
     
-    # TBD need to clean this up
-    point = (combination[0][0]-dx, combination[0][1]-dy)
-    while inRange(point):
-        antinodes.append(point)
-        point = (point[0]-dx, point[1]-dy)
+    point = (combination[0][0], combination[0][1])
+    expandAntiNodes(point, dx, dy)
+    expandAntiNodes(point, -dx,-dy)
 
-    point = (combination[0][0]+dx, combination[0][1]+dy)
-    while inRange(point):
-        antinodes.append(point)
-        point = (point[0]+dx, point[1]+dy)
-
-    point = (combination[1][0]-dx, combination[1][1]-dy)
-    while inRange(point):
-        antinodes.append(point)
-        point = (point[0]-dx, point[1]-dy)
-
-    point = (combination[1][0]+dx, combination[1][1]+dy)
-    while inRange(point):
-        antinodes.append(point)
-        point = (point[0]+dx, point[1]+dy)
+    point = (combination[1][0], combination[1][1])
+    expandAntiNodes(point, dx, dy)
+    expandAntiNodes(point, -dx,-dy)
 
 # remove duplicates
 antinodes = list(set(antinodes))

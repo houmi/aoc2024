@@ -5,6 +5,12 @@ combinations=[]
 antinodes=[]
 map={}
 
+def inRange(point):
+    if(point[0]<0 or point[0]>=len(maze) or 
+       point[1]<0 or point[1]>=len(maze[0])):
+        return False
+    return True
+
 with open('aoc8.txt', 'r') as file:
     for line in file:
         row = list(line.strip())
@@ -22,18 +28,14 @@ for key in map:
 for combination in combinations:
     dx=combination[1][0]-combination[0][0]
     dy=combination[1][1]-combination[0][1]
-    antinodes.append((combination[0][0]-dx, combination[0][1]-dy))
-    antinodes.append((combination[1][0]+dx, combination[1][1]+dy))
+    
+    prev = (combination[0][0]-dx, combination[0][1]-dy)
+    if inRange(prev):
+        antinodes.append(prev)
+    next = (combination[1][0]+dx, combination[1][1]+dy)
+    if inRange(next):
+        antinodes.append(next)
 
 # remove duplicates
 antinodes = list(set(antinodes))
-
-unique=0
-for antinode in antinodes:
-    if (antinode[0]<0 or antinode[0]>=len(maze) or
-        antinode[1]<0 or antinode[1]>=len(maze[0])):
-        continue
-    print(antinode)
-    unique +=1
-
-print(unique)
+print(len(antinodes))
