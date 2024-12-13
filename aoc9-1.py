@@ -27,6 +27,8 @@ while left < right:
     disk[right]="."
     left += 1
     right -=1
+
+#checksum
 left, right = 0, len(disk)-1
 sum = 0
 while left < right:
@@ -34,3 +36,4 @@ while left < right:
         break
     sum += (int(disk[left])*left)
     left +=1
+print(sum)
