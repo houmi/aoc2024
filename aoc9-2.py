@@ -1,12 +1,15 @@
-from collections import OrderedDict
 IDnumber = 0
 disk= []
 index=0
 fileIDtoIndexAndSize = {}
-sorted_freeSpaceIndeces = {}
+freeSpaceIndeces = []
 
-def moveFiles(fileID, srcFileIndexAndSize, freeSpaceIndecesAvailableVec):
-    dstdiskOffset = freeSpaceIndecesAvailableVec[0]
+def diskPrint(disk):
+    combined_string = ' '.join(map(str, disk))
+    print(combined_string)
+
+def moveFiles(fileID, srcFileIndexAndSize, spaceAvailableAtIndex):
+    dstdiskOffset = spaceAvailableAtIndex
     filesize = srcFileIndexAndSize[1]
     filesrcIndex = srcFileIndexAndSize[0]
     for idx in range(filesize):
@@ -27,43 +30,34 @@ with open('aoc9.txt', 'r') as file:
         c = file.read(1)
         if not c:
             break
+        if (c == '0'):
+            continue
         for i in range(int(c)):
             disk += "."
-        sorted_freeSpaceIndeces.setdefault(int(c),[]).append(index)
+        freeSpaceIndeces.append((int(c), index))
 
 #compact
-sorted_freeSpaceIndeces = OrderedDict(sorted(sorted_freeSpaceIndeces.items()))
-
 IDnumber -= 1
-for fileID in range(IDnumber, 1, -1):
+for fileID in range(IDnumber, 0, -1):
     # find how many space it uses
     srcFileIndexAndSize = fileIDtoIndexAndSize[fileID]
     srcFileSize = srcFileIndexAndSize[1]
     # find if we have space for it
-    for freeSpaceAvailable in sorted_freeSpaceIndeces:
+    for i in range(len(freeSpaceIndeces)):
         # we are interested in spaces equal or bigger to what we want to find
-        if (freeSpaceAvailable >= srcFileSize):
-            freeSpaceIndecesAvailableVec = sorted_freeSpaceIndeces.get(freeSpaceAvailable)
-            if freeSpaceIndecesAvailableVec is not None:
-                # found spaces vectors
-                # 0th index is the left most
-                dstOffset = freeSpaceIndecesAvailableVec[0]
-                if (dstOffset >= srcFileIndexAndSize[0]):
-                    break
-                moveFiles(fileID, srcFileIndexAndSize, freeSpaceIndecesAvailableVec)
-                # pop value since it is no longer the same spave available
-                freeSpaceIndecesAvailableVec.pop(0)
-                #if vector is empty, delete it from the map
-                if not freeSpaceIndecesAvailableVec:
-                    sorted_freeSpaceIndeces.pop(freeSpaceAvailable, None)
-                    break  
-                # if we didn't fill the space (i.e. file size was less than free space)                  
-                # we want to add the free space value back to the map
-                if (srcFileSize < freeSpaceAvailable):
-                    freeSpace = freeSpaceAvailable-srcFileSize
-                    freeSpaceVec = sorted_freeSpaceIndeces[freeSpace]
-                    freeSpaceVec.append(dstOffset+srcFileSize)
-                    sorted_freeSpaceIndeces[freeSpace]=(sorted(freeSpaceVec))
+        spaceAvailable = freeSpaceIndeces[i][0]
+        spaceAvailableAtIndex = freeSpaceIndeces[i][1]
+        # we won't write to the file's right
+        if (spaceAvailableAtIndex > srcFileIndexAndSize[0]):
+            break
+        if (spaceAvailable >= srcFileSize):
+            moveFiles(fileID, srcFileIndexAndSize, spaceAvailableAtIndex)
+            newSpace = spaceAvailable-srcFileSize
+            if (newSpace == 0):
+                freeSpaceIndeces.pop(i)
+            else:
+                freeSpaceIndeces[i] = (newSpace, spaceAvailableAtIndex+srcFileSize)
+            break
 
 #checksum
 left, right = 0, len(disk)-1
